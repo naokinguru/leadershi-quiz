@@ -1,0 +1,5 @@
+
+
+
+name="Naoki"
+print(name)
