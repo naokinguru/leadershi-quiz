@@ -17,6 +17,11 @@ LINE_CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
 
 user_states = {}
 
+WELCOME_MESSAGE = (
+    "リーダーシップクイズへようこそ！\n"
+    "メッセージを送るとクイズが始まります。"
+)
+
 
 def load_questions():
     questions = []
@@ -140,13 +145,19 @@ def webhook():
 
     events = json.loads(body.decode("utf-8")).get("events", [])
     for event in events:
-        if event.get("type") != "message":
+        event_type = event.get("type")
+        reply_token = event.get("replyToken")
+
+        if event_type == "follow" and reply_token:
+            reply_message(reply_token, WELCOME_MESSAGE)
+            continue
+
+        if event_type != "message":
             continue
         if event.get("message", {}).get("type") != "text":
             continue
 
         user_id = event.get("source", {}).get("userId")
-        reply_token = event.get("replyToken")
         text = event.get("message", {}).get("text", "")
 
         if user_id and reply_token:
